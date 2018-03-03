@@ -1,7 +1,7 @@
 <?php
 
 	// Set Timezone as server time
-	if(version_compare(PHP_VERSION, '5.3.0') >= 0)
+	if(version_compare(PHP_VERSION, '5.6.0') >= 0)
 	{
 		date_default_timezone_set(@date_default_timezone_get());
 	}

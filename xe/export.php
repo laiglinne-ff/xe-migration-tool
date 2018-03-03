@@ -290,36 +290,45 @@
             $obj->status = $document_info->status;
             $obj->allow_comment = $document_info->allow_comment;
             $obj->lock_comment = $document_info->lock_comment;
-            $obj->allow_trackback = $document_info->allow_trackback;
             $obj->is_notice = $document_info->is_notice;
             $obj->is_secret = $document_info->is_secret;
             $obj->regdate =  $document_info->regdate;
             $obj->update = $document_info->last_update;
             $obj->tags = $document_info->tags;
 
-			// 게시글의 엮인글을 구함 
-			if($db_info->db_type == 'cubrid')
-			{
-				$query = sprintf('select * from "%s_trackbacks" where "document_srl" = \'%s\' order by "trackback_srl"', $db_info->db_table_prefix, $document_info->document_srl);
-			}
-			else
-			{
-				$query = sprintf("select * from %s_trackbacks where document_srl = '%s' order by trackback_srl", $db_info->db_table_prefix, $document_info->document_srl);
-			}
 
-            $trackbacks = array();
-            $trackback_result = $oMigration->query($query);
-            while($trackback_info = $oMigration->fetch($trackback_result)) {
-                $trackback_obj = null;
-                $trackback_obj->url = $trackback_info->url;
-                $trackback_obj->title = $trackback_info->title;
-                $trackback_obj->blog_name = $trackback_info->blog_name;
-                $trackback_obj->excerpt = $trackback_info->excerpt;
-                $trackback_obj->regdate = $trackback_info->regdate;
-                $trackback_obj->ipaddress = $trackback_info->ipaddress;
-                $trackbacks[] = $trackback_obj;
+            try
+            {
+                $obj->allow_trackback = $document_info->allow_trackback;
+    
+                // 게시글의 엮인글을 구함 
+                if($db_info->db_type == 'cubrid')
+                {
+                    $query = sprintf('select * from "%s_trackbacks" where "document_srl" = \'%s\' order by "trackback_srl"', $db_info->db_table_prefix, $document_info->document_srl);
+                }
+                else
+                {
+                    $query = sprintf("select * from %s_trackbacks where document_srl = '%s' order by trackback_srl", $db_info->db_table_prefix, $document_info->document_srl);
+                }
+    
+                $trackbacks = array();
+                $trackback_result = $oMigration->query($query);
+                while($trackback_info = $oMigration->fetch($trackback_result)) {
+                    $trackback_obj = null;
+                    $trackback_obj->url = $trackback_info->url;
+                    $trackback_obj->title = $trackback_info->title;
+                    $trackback_obj->blog_name = $trackback_info->blog_name;
+                    $trackback_obj->excerpt = $trackback_info->excerpt;
+                    $trackback_obj->regdate = $trackback_info->regdate;
+                    $trackback_obj->ipaddress = $trackback_info->ipaddress;
+                    $trackbacks[] = $trackback_obj;
+                }
+                $obj->trackbacks = $trackbacks;
             }
-            $obj->trackbacks = $trackbacks;
+            catch(Exception $x)
+            {
+
+            }
 
             // 게시글의 댓글을 구함
             $comments = array();
